@@ -250,6 +250,7 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
 
     conf = {'broker.version.fallback': '0.9.0',
+            'debug': 'consumer',
             # Do explicit manual offset stores to avoid race conditions
             # where a message is consumed from librdkafka but not yet handled
             # by the Python code that keeps track of last consumed offset.
