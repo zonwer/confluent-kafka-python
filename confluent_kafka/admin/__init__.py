@@ -1,21 +1,30 @@
 """
 Kafka Admin client: create, view, alter, delete topics and resources.
 """
-from ..cimpl import (KafkaException, # noqa
-                     _AdminClientImpl,
-                     NewTopic,
-                     NewPartitions,
-                     CONFIG_SOURCE_UNKNOWN_CONFIG,
-                     CONFIG_SOURCE_DYNAMIC_TOPIC_CONFIG,
-                     CONFIG_SOURCE_DYNAMIC_BROKER_CONFIG,
-                     CONFIG_SOURCE_DYNAMIC_DEFAULT_BROKER_CONFIG,
-                     CONFIG_SOURCE_STATIC_BROKER_CONFIG,
-                     CONFIG_SOURCE_DEFAULT_CONFIG,
-                     RESOURCE_UNKNOWN,
-                     RESOURCE_ANY,
-                     RESOURCE_TOPIC,
-                     RESOURCE_GROUP,
-                     RESOURCE_BROKER)
+from confluent_kafka.cimpl import (KafkaException,
+                                   _AdminClientImpl,
+                                   NewTopic,
+                                   NewPartitions,
+                                   CONFIG_SOURCE_UNKNOWN_CONFIG,
+                                   CONFIG_SOURCE_DYNAMIC_TOPIC_CONFIG,
+                                   CONFIG_SOURCE_DYNAMIC_BROKER_CONFIG,
+                                   CONFIG_SOURCE_DYNAMIC_DEFAULT_BROKER_CONFIG,
+                                   CONFIG_SOURCE_STATIC_BROKER_CONFIG,
+                                   CONFIG_SOURCE_DEFAULT_CONFIG,
+                                   RESOURCE_UNKNOWN,
+                                   RESOURCE_ANY,
+                                   RESOURCE_TOPIC,
+                                   RESOURCE_GROUP,
+                                   RESOURCE_BROKER)
+
+__all__ = ['CONFIG_SOURCE_DEFAULT_CONFIG',
+           'CONFIG_SOURCE_DYNAMIC_BROKER_CONFIG',
+           'CONFIG_SOURCE_DYNAMIC_DEFAULT_BROKER_CONFIG',
+           'CONFIG_SOURCE_DYNAMIC_TOPIC_CONFIG',
+           'CONFIG_SOURCE_STATIC_BROKER_CONFIG',
+           'CONFIG_SOURCE_UNKNOWN_CONFIG',
+           'NewTopic',
+           'NewPartitions']
 
 import concurrent.futures
 import functools
@@ -122,7 +131,8 @@ class ConfigResource(object):
             try:
                 restype = ConfigResource.Type[restype.upper()]
             except KeyError:
-                raise ValueError("Unknown resource type \"%s\": should be a ConfigResource.Type" % restype)
+                raise ValueError(
+                    "Unknown resource type \"%s\": should be a ConfigResource.Type" % restype)
 
         elif type(restype) == int:
             # The C-code passes restype as an int, convert to Type.
@@ -182,7 +192,7 @@ class ConfigResource(object):
         self.set_config_dict[name] = value
 
 
-class AdminClient (_AdminClientImpl):
+class AdminClient(_AdminClientImpl):
     """
     AdminClient provides admin operations for Kafka brokers, topics, groups,
     and other resource types supported by the broker.
@@ -203,6 +213,7 @@ class AdminClient (_AdminClientImpl):
 
     Requires broker version v0.11.0.0 or later.
     """
+
     def __init__(self, conf):
         """
         Create a new AdminClient using the provided configuration dictionary.
@@ -250,7 +261,8 @@ class AdminClient (_AdminClientImpl):
             for resource, configs in result.items():
                 fut = futmap.get(resource, None)
                 if fut is None:
-                    raise RuntimeError("Resource {} not found in future-map: {}".format(resource, futmap))
+                    raise RuntimeError(
+                        "Resource {} not found in future-map: {}".format(resource, futmap))
                 if resource.error is not None:
                     # Resource-level exception
                     fut.set_exception(KafkaException(resource.error))
@@ -462,7 +474,7 @@ class AdminClient (_AdminClientImpl):
         return futmap
 
 
-class ClusterMetadata (object):
+class ClusterMetadata(object):
     """
     ClusterMetadata as returned by list_topics() contains information
     about the Kafka cluster, brokers, and topics.
@@ -476,6 +488,7 @@ class ClusterMetadata (object):
     :ivar int orig_broker_id: The broker this metadata originated from.
     :ivar str orig_broker_name: Broker name/address this metadata originated from.
     """
+
     def __init__(self):
         self.cluster_id = None
         self.controller_id = -1
@@ -491,7 +504,7 @@ class ClusterMetadata (object):
         return str(self.cluster_id)
 
 
-class BrokerMetadata (object):
+class BrokerMetadata(object):
     """
     BrokerMetadata contains information about a Kafka broker.
 
@@ -501,6 +514,7 @@ class BrokerMetadata (object):
     :ivar str host: Broker hostname.
     :ivar int port: Broker port.
     """
+
     def __init__(self):
         self.id = -1
         self.host = None
@@ -513,7 +527,7 @@ class BrokerMetadata (object):
         return "{}:{}/{}".format(self.host, self.port, self.id)
 
 
-class TopicMetadata (object):
+class TopicMetadata(object):
     """
     TopicMetadata contains information about a Kafka topic.
 
@@ -523,6 +537,7 @@ class TopicMetadata (object):
     :ivar dict partitions: Map of partitions indexed by partition id. Value is PartitionMetadata object.
     :ivar KafkaError -error: Topic error, or None. Value is a KafkaError object.
     """
+
     # The dash in "-topic" and "-error" is needed to circumvent a
     # Sphinx issue where it tries to reference the same instance variable
     # on other classes which raises a warning/error.
@@ -533,7 +548,8 @@ class TopicMetadata (object):
 
     def __repr__(self):
         if self.error is not None:
-            return "TopicMetadata({}, {} partitions, {})".format(self.topic, len(self.partitions), self.error)
+            return "TopicMetadata({}, {} partitions, {})".format(self.topic, len(self.partitions),
+                                                                 self.error)
         else:
             return "TopicMetadata({}, {} partitions)".format(self.topic, len(self.partitions))
 
@@ -541,7 +557,7 @@ class TopicMetadata (object):
         return self.topic
 
 
-class PartitionMetadata (object):
+class PartitionMetadata(object):
     """
     PartitionsMetadata contains information about a Kafka partition.
 
@@ -558,6 +574,7 @@ class PartitionMetadata (object):
               in ClusterMetadata.brokers. Always check the availability
               of a broker id in the brokers dict.
     """
+
     def __init__(self):
         self.id = -1
         self.leader = -1

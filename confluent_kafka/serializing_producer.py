@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-from .cimpl import Producer as _ProducerImpl
+from confluent_kafka.cimpl import Producer as _ProducerImpl
 from .serialization import (MessageField,
                             SerializationContext)
 
